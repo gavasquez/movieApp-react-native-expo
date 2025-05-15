@@ -3,9 +3,18 @@ import { MovieDBMoviesResponse } from '../../../infrastructure/interfaces/movie-
 import { MovieMapper } from '../../../infrastructure/mappers/movie.mapper';
 import { Movie } from '../../entities/movie.entity';
 
-export const moviesPopularUseCase = async (fecther: HttpAdapter): Promise<Movie[]> => {
+interface Options {
+  page?: number;
+  limit?: number;
+}
+
+export const moviesPopularUseCase = async (fecther: HttpAdapter, options?: Options): Promise<Movie[]> => {
   try {
-    const popular = await fecther.get<MovieDBMoviesResponse>("/popular");
+    const popular = await fecther.get<MovieDBMoviesResponse>("/popular", {
+      params: {
+        page: options?.page ?? 1,
+      }
+    });
     return popular.results.map(MovieMapper.fromMovieDbResultToEntity);
   } catch (error) {
     console.log({ error });
